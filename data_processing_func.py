@@ -1,9 +1,11 @@
 from crypto_apis.binance_api import binance_trading_volume , binance_server_time, min_to_ms
-import math
+import math , os
 from datetime import datetime , timedelta
 import pandas as pd
+from dotenv import load_dotenv
+load_dotenv(os.path.join("dataset_parameters.env"))
+
 """
-Try to use Pyarrow backend for pandas for this project
 
 On avg 80 Bytes per row of the dataframe
 
@@ -15,6 +17,11 @@ If the window is 2.5min or 150s you could have 4.5 years of data or 5.5 years wi
 
 
 """
+
+MAX_TIME_FRAME_HOURS = int(os.getenv("MAX_TIME_FRAME_HOURS")) # type: ignore /// how far back will data be collected in hours, equivalent to 5,5 years 
+
+CRYPTO_TOKEN_NAMES = {"BTCUSDT", "ETHUSDT", "SOLUSDT"} #Binance names for the accepted crypto tokens and their value in USDT 
+
 
 def add_crypto_dataframes(newer_data:pd.DataFrame , older_data: pd.DataFrame)->pd.DataFrame:
     """
@@ -59,14 +66,22 @@ def update_crypto_dataframes(newer_data:pd.DataFrame , older_data: pd.DataFrame,
 
     return pd.concat(objs=[newer_data,older_data], axis= 0, ignore_index=True)
 
-def crypto_data_to_df(time_frame_hours:int|float, crypto_token: str)-> pd.DataFrame: 
-    
+def crypto_data_to_df(time_frame_hours:int|float,crypto_token: str, end_unix_time:int = 0)-> pd.DataFrame: 
+    """
+    TODO
+    make this function not throw exceptions but rather return None on errors and handle theses Nones on the main.py functions, to retry gathering data on a certain interval   
+    """
     if not isinstance(time_frame_hours,int) and not isinstance(time_frame_hours,float):
         raise TypeError("Input time frame isnt an int or float")
+    if time_frame_hours > MAX_TIME_FRAME_HOURS:
+        raise IOError(f"Amount of hours exceeds MAX_TIME_FRAME of {MAX_TIME_FRAME_HOURS} hours ({MAX_TIME_FRAME_HOURS/24/365} years)")
+    if crypto_token not in CRYPTO_TOKEN_NAMES:
+        raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
     
-    time_frame_mins = time_frame_hours * 60
-    DATA_TIME_WINDOW_MIN = 5 #how many minutes of data does each column represent
-    num_rows = math.ceil(time_frame_mins/DATA_TIME_WINDOW_MIN) #how many time_window rows will be needed to cover the entire time_frame passed as arg
+    time_frame_mins:int | float = time_frame_hours * 60
+    DATA_TIME_WINDOW_MIN = int(os.getenv("DATA_TIME_WINDOW_MIN")) # type: ignore /// how many minutes of data does each column represent
+    
+    num_rows:int = math.ceil(time_frame_mins/DATA_TIME_WINDOW_MIN) #how many time_window rows will be needed to cover the entire time_frame passed as arg
 
     columns_list:list[str] = [   
                   "DATE", 
@@ -80,21 +95,27 @@ def crypto_data_to_df(time_frame_hours:int|float, crypto_token: str)-> pd.DataFr
     
     df = pd.DataFrame(columns = columns_list)
     
-    start_date = datetime.now().replace(microsecond=0)
-    cur_unix_time: int | None = binance_server_time()
+    if end_unix_time == 0:
+        start_date = datetime.now().replace(microsecond=0)
+        cur_unix_time: int | None = binance_server_time()
 
-    if cur_unix_time == None:
-       raise Exception("Initial time for the binance server wasnt able to be established")
+        if cur_unix_time == None:
+         raise Exception("Initial time for the binance server wasnt able to be established")
+    else:
+         start_date = datetime.fromtimestamp(end_unix_time)
+         cur_unix_time = end_unix_time
 
-    for i in range(num_rows): #time window loop
+    for i in range(num_rows): #time window loop, each iteration adds a row to the df
 
         cur = crypto_token + "USDT" #binance symbol for token to USDT (TETHER) price   
-        data:dict = binance_trading_volume(
+        data:dict | None = binance_trading_volume(
                     time_window_min=DATA_TIME_WINDOW_MIN,
                     end_unix_time= cur_unix_time,
                     crypto_token= cur
                    )
-        currency_data:list[float|int|None|datetime] = [
+        if data == None: #in case the row data is incomplete, just skip that time frame 
+            continue
+        currency_data:list[float|int|datetime] = [
                         start_date, 
                         data.get(f"{cur}_INITIAL_PRICE",None),
                         data.get(f"{cur}_FINAL_PRICE",None),

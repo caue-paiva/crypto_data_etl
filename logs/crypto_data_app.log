@@ -1,0 +1,22 @@
+2024-01-23 20:46:36,084 [DEBUG] crypto_data_etl: debug message
+2024-01-23 20:46:36,088 [INFO] crypto_data_etl: info message
+2024-01-23 20:46:36,088 [WARNING] crypto_data_etl: warning message
+2024-01-23 20:46:36,089 [ERROR] crypto_data_etl: error message
+2024-01-23 20:46:36,089 [CRITICAL] crypto_data_etl: critical message
+2024-01-23 20:46:36,089 [ERROR] crypto_data_etl: exception
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/logging_test.py", line 20, in <module>
+    1/0
+    ~^~
+ZeroDivisionError: division by zero
+2024-01-23 20:47:14,386 [DEBUG] crypto_data_etl: debug message
+2024-01-23 20:47:14,386 [INFO] crypto_data_etl: info message
+2024-01-23 20:47:14,386 [WARNING] crypto_data_etl: warning message
+2024-01-23 20:47:14,386 [ERROR] crypto_data_etl: error message
+2024-01-23 20:47:14,386 [CRITICAL] crypto_data_etl: critical message
+2024-01-23 20:47:14,387 [ERROR] crypto_data_etl: exception
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/logging_test.py", line 19, in <module>
+    1/0
+    ~^~
+ZeroDivisionError: division by zero
