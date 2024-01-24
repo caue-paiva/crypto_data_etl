@@ -3,15 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', "dataset_parameters.env"))
 
-def binance_server_time()->int | None:
-        response = requests.get("https://api.binance.com/api/v3/time")
-        if response.status_code == 200:
-             json_result:dict = response.json()
-             return json_result.get("serverTime",None)
-        else:
-            return None
-
-def op_is_sell(transaction:dict)->bool | None: 
+def __op_is_sell(transaction:dict)->bool | None: 
      """
      #Sell Operation ("m" is true): The trade represents selling BTC for USDT.   
      #Buy Operation ("m" is false): The trade represents buying BTC with USDT.
@@ -24,7 +16,7 @@ def op_is_sell(transaction:dict)->bool | None:
 def min_to_ms(min:int | float)->int:
      return int(min*60*1000)
 
-def binance_crypto_price(symbol:str, end_time_unix:int)->float | None:
+def __binance_crypto_price(symbol:str, end_time_unix:int)->float | None:
      UNIX_TIME_INTERVAL = int(os.getenv("PRICE_API_TIME_INTERVAL")) # type: ignore /// in ms, approx 10s
      kline_data_url = "https://api.binance.com/api/v3/klines"
      params:dict = {
@@ -43,6 +35,14 @@ def binance_crypto_price(symbol:str, end_time_unix:int)->float | None:
      
      return float(json_result[0][1])
 
+def binance_server_time()->int | None:
+        response = requests.get("https://api.binance.com/api/v3/time")
+        if response.status_code == 200:
+             json_result:dict = response.json()
+             return json_result.get("serverTime",None)
+        else:
+            return None
+
 def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_unix_time:int = 0)-> dict[str,float|int] | None:
    
     MAX_REQUEST_TIMEFRAME = int(os.getenv("TRADE_API_TIME_INTERVAL")) # type: ignore /// 60-90k ms is the limit time (based on some test) where you can get all aggregata trading without hitting the 1000 results limit on the binance API
@@ -60,7 +60,7 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
     total_transactions:int = 0
     requests_hitting_limit:int = 0 #number of requests hitting the 1000 responses API limit
    
-    final_price: float | None = binance_crypto_price(symbol=crypto_token,end_time_unix=end_time)
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
 
     if final_price == None:
          return None 
@@ -95,7 +95,7 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
                 price:float = float(transaction.get("p",0.0))
                 quantity: float = float(transaction.get("q",0.0))
                 
-                if op_is_sell(transaction):
+                if __op_is_sell(transaction):
                     total_sell_coins += quantity
                     total_sell_usd += quantity * price 
                 else:
@@ -104,13 +104,13 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
 
         end_time -= MAX_REQUEST_TIMEFRAME
 
-    start_price: float | None = binance_crypto_price(symbol=crypto_token,end_time_unix=end_time)
+    start_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the earliest date in the timeframe
 
     if start_price == None:
          return None 
     
-    if requests_hitting_limit/requests_needed > 0.5:
-          print("More than half of requests are hitting the binance API rate limit")
+    #if requests_hitting_limit/requests_needed > 0.5:
+        #  print("More than half of requests are hitting the binance API rate limit")
     
     return {
             f"{crypto_token}_START_PRICE": start_price, 
@@ -127,6 +127,6 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
 if __name__ == "__main__":
    #print(binance_trading_volume(30, crypto_token="SOLUSDT"))
    cur_time = binance_server_time()
-   return_data = binance_crypto_price("BTCUSDT",cur_time) # type: ignore
+   return_data = __binance_crypto_price("BTCUSDT",cur_time) # type: ignore
    print(return_data)
   

@@ -14,7 +14,7 @@
             "stream": "ext://sys.stderr" 
         },
         "file": { 
-            "level": "DEBUG",
+            "level": "WARNING",
             "formatter": "simple",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": "logs/crypto_data_app.log",
@@ -24,7 +24,7 @@
     },
     "loggers": { 
        "root":{
-         "level": "DEBUG",
+         "level": "WARNING",
          "handlers": ["stderr", "file"]
        }
     } 

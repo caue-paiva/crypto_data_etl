@@ -37,7 +37,6 @@ def add_crypto_dataframes(newer_data:pd.DataFrame , older_data: pd.DataFrame)->p
 
     newer_date = newer_data.at[0,"DATE"]
     old_date = older_data.at[0,"DATE"]
-    print(newer_date,old_date)
     if old_date > newer_date:
         raise IOError("most recent date from the older dataframe is more recent than the dates from the newer dataframe")
 
@@ -66,10 +65,19 @@ def update_crypto_dataframes(newer_data:pd.DataFrame , older_data: pd.DataFrame,
 
     return pd.concat(objs=[newer_data,older_data], axis= 0, ignore_index=True)
 
-def crypto_data_to_df(time_frame_hours:int|float,crypto_token: str, end_unix_time:int = 0)-> pd.DataFrame: 
+def create_crypto_dataframe(time_frame_hours:int|float,crypto_token: str, end_unix_time:int = 0)-> pd.DataFrame | None: 
     """
-    TODO
-    make this function not throw exceptions but rather return None on errors and handle theses Nones on the main.py functions, to retry gathering data on a certain interval   
+    Function that returns a pd Dataframe or None (if no data was able to be returned) with each column being data about price , trading volume
+    and net-flow of a given crypto asset
+
+    Args:
+      time_frame_hours (int|float): how many hours backwards from the start time should the dataset cover, each column of the df spams 5min
+
+      crypto_token (str) : crypto asset that the data will belong to, needs to be on binance token format (ex. BTCUSDT)
+
+      end_unix_time (int, default 0): time from which the backwards scan in time will start from, if no arg is given it will start from current
+      binance server time
+    
     """
     if not isinstance(time_frame_hours,int) and not isinstance(time_frame_hours,float):
         raise TypeError("Input time frame isnt an int or float")
@@ -85,13 +93,13 @@ def crypto_data_to_df(time_frame_hours:int|float,crypto_token: str, end_unix_tim
 
     columns_list:list[str] = [   
                   "DATE", 
-                 f"{crypto_token}_INITIAL_PRICE",
-                 f"{crypto_token}_FINAL_PRICE",
+                 f"{crypto_token}_START_PRICE",
+                 f"{crypto_token}_END_PRICE",
                  f"{crypto_token}_COINS_BOUGHT",
                  f"{crypto_token}_COINS_SOLD",
                  f"{crypto_token}_NET_FLOW",
                  f"{crypto_token}_TOTAL_AGGRT_TRANSACTIONS"
-                            ]
+                             ]
     
     df = pd.DataFrame(columns = columns_list)
     
@@ -100,25 +108,28 @@ def crypto_data_to_df(time_frame_hours:int|float,crypto_token: str, end_unix_tim
         cur_unix_time: int | None = binance_server_time()
 
         if cur_unix_time == None:
-         raise Exception("Initial time for the binance server wasnt able to be established")
+           return None
     else:
-         start_date = datetime.fromtimestamp(end_unix_time)
+         start_date = datetime.fromtimestamp(end_unix_time /1000)
          cur_unix_time = end_unix_time
 
     for i in range(num_rows): #time window loop, each iteration adds a row to the df
-
-        cur = crypto_token + "USDT" #binance symbol for token to USDT (TETHER) price   
+        
+        if "USDT" not in crypto_token:
+            cur = crypto_token + "USDT" #binance symbol for token to USDT (TETHER) price   
+        else:
+            cur = crypto_token
         data:dict | None = binance_trading_volume(
-                    time_window_min=DATA_TIME_WINDOW_MIN,
-                    end_unix_time= cur_unix_time,
-                    crypto_token= cur
+                        time_window_min=DATA_TIME_WINDOW_MIN,
+                        end_unix_time= cur_unix_time,  # type: ignore
+                        crypto_token= cur
                    )
         if data == None: #in case the row data is incomplete, just skip that time frame 
             continue
         currency_data:list[float|int|datetime] = [
                         start_date, 
-                        data.get(f"{cur}_INITIAL_PRICE",None),
-                        data.get(f"{cur}_FINAL_PRICE",None),
+                        data.get(f"{cur}_START_PRICE",None),
+                        data.get(f"{cur}_END_PRICE",None),
                         data.get(f"{cur}_COINS_BOUGHT",None),
                         data.get(f"{cur}_COINS_SOLD",None),
                         data.get(f"{cur}_NET_FLOW",None),
@@ -129,8 +140,10 @@ def crypto_data_to_df(time_frame_hours:int|float,crypto_token: str, end_unix_tim
         df.loc[i] = currency_data # type: ignore
         start_date -= timedelta(minutes=DATA_TIME_WINDOW_MIN)
     
+    if df.shape[0] == 0:
+        return None
     return df
 
 
-#df: pd.DataFrame = crypto_data_to_df(0.5, "BTC" )
+#df: pd.DataFrame = create_crypto_dataframe(0.5, "BTC" )
 #df.to_csv("teste2.csv", index= False)
