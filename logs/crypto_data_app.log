@@ -644,3 +644,5 @@ Traceback (most recent call last):
   File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
     raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
 OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}
+2024-01-25 18:58:28,773 [ERROR] crypto_data_etl_main: Not enough command-line arguments were passed
+NoneType: None

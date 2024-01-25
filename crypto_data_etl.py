@@ -1,4 +1,4 @@
-import logging.config , json , os ,  time , math
+import logging.config,json,os,time,math
 import pandas as pd
 from crypto_apis.binance_api import binance_trading_volume , min_to_ms
 from datetime import datetime , timedelta
@@ -7,46 +7,20 @@ from datetime import datetime , timedelta
 max time back of 2,75 years should take around 230 hours to complete (almost 10 days)
 
 """
-
-"""
-TODO
-1)See if it makes sense to join the main etl functions in a class, considering theres state that influnces both of their actions 
-(filling or updating dataset, num of rows in the file..)
-
-2) make a speed and exec time profile of my code to see what is making it slower and try to optimize it (see if the .env variables are making them slower)
-
-3) Add error handling and retries to the save_file_function
-"""
-
 def setup_logging():
-    with open(os.path.join("logger_config.json"), "r") as f:
-        log_config = json.load(f)
-        logging.config.dictConfig(config=log_config)
+    try:
+        with open(os.path.join("logger_config.json"), "r") as f:
+            log_config = json.load(f)
+            logging.config.dictConfig(config=log_config)
+    except:
+        raise Exception("wasnt able to find/open the file logger_config.json, this makes logging impossible")
 
 setup_logging()
-
-"""def write_df_file(df:pd.DataFrame)->bool:
-        
-        Tries to write the Dataframe file  locally for a set amount of times, returns True of False for the sucess of that op
-       
-        max_write_tries:int = 20
-        for i in range(max_write_tries):
-            try:
-                df.to_csv("teste3.csv", index=False)
-                break
-            except Exception as e:
-                time.sleep(0.5)
-        else:
-            return False
-        
-        return True
-"""
-
 
 class CryptoDataETL():
  
     SUPPORTED_CRYPTO_TOKENS:set[str] = {"BTC", "ETH", "SOL"}
-    MAX_TIME_FRAME_HOURS = 24090   #how far back will data be collected in hours, equivalent to 2,75 years 
+    MAX_TIME_FRAME_HOURS = 8   #how far back will data be collected in hours, equivalent to 2,75 years 
     DATA_TIME_WINDOW_MIN = 5 #how many minutes of data does each column represent
     TRADE_API_TIME_INTERVAL = 100000 #in ms, the time window for getting aggregated transaction data
     DATA_CHUNK_NUM_ROWS = 10000 #how many rows of data are stored in each chunk of the dataframe, 10k rows means each chunk covers 834 hours
@@ -273,7 +247,7 @@ class CryptoDataETL():
         
         CHUNKS_OF_DATA:int = self.__get_num_chunks(MAX_TIME_FRAME_HOURS) #in how many data chunks we are going to split the extraction 
         hours_per_chunk: float = MAX_TIME_FRAME_HOURS/CHUNKS_OF_DATA #before 3, after 2.5
-    
+        print(f"chunks of data {CHUNKS_OF_DATA}")
         cur_unix_time:int = self.__seconds_to_unix(time.time())
         self.__latest_unix_time = cur_unix_time
 
@@ -287,8 +261,8 @@ class CryptoDataETL():
         
     def update_dataset(self, df: pd.DataFrame)->pd.DataFrame:
         """
-        updates the dataset with data from current time to the latest_unix_time in the dataset, a valid instance var of the latest_unix_time
-        must be set before calling this method
+        updates the dataset with data from current time to the latest_unix_time in the dataset, 
+        a valid instance var of the latest_unix_time must be set before calling this method
         
         """
         if self.__latest_unix_time == -1:
