@@ -156,3 +156,491 @@ Traceback (most recent call last):
   File "/home/kap/first_de_project/main.py", line 85, in fill_dataset
     raise ValueError("data-chunk returned is none")
 ValueError: data-chunk returned is none
+2024-01-25 10:28:31,198 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 212, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPSConnection object at 0x7f41d2f38790>, 'Connection to api.binance.com timed out. (connect timeout=None)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706188993511&endTime=1706189083511&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f41d2f38790>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 79, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 84, in binance_trading_volume
+    response: requests.Response = requests.get("https://api.binance.com/api/v3/aggTrades", params=params)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706188993511&endTime=1706189083511&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f41d2f38790>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+2024-01-25 10:30:44,317 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 212, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPSConnection object at 0x7f41d2dadd10>, 'Connection to api.binance.com timed out. (connect timeout=None)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706189083511&endTime=1706189173511&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f41d2dadd10>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 79, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 84, in binance_trading_volume
+    response: requests.Response = requests.get("https://api.binance.com/api/v3/aggTrades", params=params)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706189083511&endTime=1706189173511&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f41d2dadd10>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+2024-01-25 10:32:57,438 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 212, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPSConnection object at 0x7f41d2dafed0>, 'Connection to api.binance.com timed out. (connect timeout=None)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/klines?symbol=BTCUSDT&interval=1s&startTime=1706189172511&endTime=1706189173511&limit=1 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f41d2dafed0>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 79, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 65, in binance_trading_volume
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 29, in __binance_crypto_price
+    response = requests.get(url=kline_data_url, params=params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/klines?symbol=BTCUSDT&interval=1s&startTime=1706189172511&endTime=1706189173511&limit=1 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f41d2dafed0>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+2024-01-25 10:37:27,774 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 212, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPSConnection object at 0x7f204e38c450>, 'Connection to api.binance.com timed out. (connect timeout=None)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706189528170&endTime=1706189618170&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f204e38c450>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 79, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 84, in binance_trading_volume
+    response: requests.Response = requests.get("https://api.binance.com/api/v3/aggTrades", params=params)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706189528170&endTime=1706189618170&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f204e38c450>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+2024-01-25 10:41:51,966 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 212, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPSConnection object at 0x7f0186c5ee10>, 'Connection to api.binance.com timed out. (connect timeout=None)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/klines?symbol=BTCUSDT&interval=1s&startTime=1706189978835&endTime=1706189979835&limit=1 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f0186c5ee10>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 79, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 65, in binance_trading_volume
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 29, in __binance_crypto_price
+    response = requests.get(url=kline_data_url, params=params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/klines?symbol=BTCUSDT&interval=1s&startTime=1706189978835&endTime=1706189979835&limit=1 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f0186c5ee10>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+2024-01-25 10:44:05,086 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connection.py", line 212, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPSConnection object at 0x7f0186c5cc10>, 'Connection to api.binance.com timed out. (connect timeout=None)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/urllib3/util/retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706189889835&endTime=1706189979835&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f0186c5cc10>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 79, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 84, in binance_trading_volume
+    response: requests.Response = requests.get("https://api.binance.com/api/v3/aggTrades", params=params)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/requests/adapters.py", line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/aggTrades?symbol=BTCUSDT&startTime=1706189889835&endTime=1706189979835&limit=1000 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f0186c5cc10>, 'Connection to api.binance.com timed out. (connect timeout=None)'))
+2024-01-25 16:02:52,361 [ERROR] crypto_data_etl_BTC: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 77, in get_data_chunks
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
+    raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
+OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}
+2024-01-25 16:02:52,862 [ERROR] crypto_data_etl_BTC: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 77, in get_data_chunks
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
+    raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
+OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}
+2024-01-25 16:02:53,363 [ERROR] crypto_data_etl_BTC: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 77, in get_data_chunks
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
+    raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
+OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}
+2024-01-25 16:02:53,864 [ERROR] crypto_data_etl_BTC: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 77, in get_data_chunks
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
+    raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
+OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}
+2024-01-25 16:02:54,366 [ERROR] crypto_data_etl_BTC: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 77, in get_data_chunks
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
+    raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
+OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}
+2024-01-25 16:02:54,867 [ERROR] crypto_data_etl_BTC: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 77, in get_data_chunks
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
+    raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
+OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}
+2024-01-25 16:02:55,369 [ERROR] crypto_data_etl_BTC: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 77, in get_data_chunks
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 87, in create_crypto_dataframe
+    raise IOError(f"crypto token not supported, heres the list of supported ones {CRYPTO_TOKEN_NAMES}")
+OSError: crypto token not supported, heres the list of supported ones {'SOLUSDT', 'BTCUSDT', 'ETHUSDT'}

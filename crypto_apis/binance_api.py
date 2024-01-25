@@ -45,6 +45,7 @@ def binance_server_time()->int | None:
             return None
 
 def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_unix_time:int = 0)-> dict[str,float|int] | None:
+    print("binance func")
     bin_api_func :float = time.time()
     MAX_REQUEST_TIMEFRAME = int(os.getenv("TRADE_API_TIME_INTERVAL")) # type: ignore /// 60-90k ms is the limit time (based on some test) where you can get all aggregata trading without hitting the 1000 results limit on the binance API
     time_window_ms = min_to_ms(time_window_min)
@@ -52,9 +53,7 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
     requests_needed:int = math.ceil(time_window_ms/MAX_REQUEST_TIMEFRAME)
 
     if end_unix_time == 0:
-        end_time: int | None = binance_server_time()
-        if end_time ==  None:
-            return None 
+        end_time: int  =int(time.time() * 1000)
     else:
         end_time = end_unix_time
     
@@ -79,13 +78,13 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
             "endTime":    end_time,
             "limit" : 1000
         }
-        
+        print("waiting response")
         response: requests.Response = requests.get("https://api.binance.com/api/v3/aggTrades", params=params)
         if response.status_code == 200:
                 json_result:list[dict] = response.json()
         else:
                 return None 
-        
+        print("got response")
         num_transactions:int = len(json_result)
         total_transactions += num_transactions
     
@@ -130,6 +129,8 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
 if __name__ == "__main__":
    #print(binance_trading_volume(30, crypto_token="SOLUSDT"))
    cur_time = binance_server_time()
-   return_data = __binance_crypto_price("BTCUSDT",cur_time) # type: ignore
-   print(return_data)
+   print(int(1000* time.time()))
+   print(cur_time)
+   #return_data = __binance_crypto_price("BTCUSDT",cur_time) # type: ignore
+   #print(return_data)
   
