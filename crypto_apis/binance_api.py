@@ -1,7 +1,4 @@
-import requests , math  ,os , time
-from dotenv import load_dotenv
-
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', "dataset_parameters.env"))
+import requests , math, time
 
 def __op_is_sell(transaction:dict)->bool | None: 
      """
@@ -16,8 +13,8 @@ def __op_is_sell(transaction:dict)->bool | None:
 def min_to_ms(min:int | float)->int:
      return int(min*60*1000)
 
-def __binance_crypto_price(symbol:str, end_time_unix:int)->float | None:
-     UNIX_TIME_INTERVAL = int(os.getenv("PRICE_API_TIME_INTERVAL")) # type: ignore /// in ms, approx 10s
+def __binance_crypto_price(symbol:str, api_time_interval_ms:int ,end_time_unix:int)->float | None:
+     UNIX_TIME_INTERVAL:int = api_time_interval_ms # in ms, approx 10s
      kline_data_url = "https://api.binance.com/api/v3/klines"
      params:dict = {
           "symbol": symbol,
@@ -44,10 +41,10 @@ def binance_server_time()->int | None:
         else:
             return None
 
-def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_unix_time:int = 0)-> dict[str,float|int] | None:
+def binance_trading_volume(time_window_min: float|int, crypto_token:str,api_time_interval_ms:int ,end_unix_time:int = 0)-> dict[str,float|int] | None:
     print("binance func")
     bin_api_func :float = time.time()
-    MAX_REQUEST_TIMEFRAME = int(os.getenv("TRADE_API_TIME_INTERVAL")) # type: ignore /// 60-90k ms is the limit time (based on some test) where you can get all aggregata trading without hitting the 1000 results limit on the binance API
+    MAX_REQUEST_TIMEFRAME = api_time_interval_ms # type: ignore /// 60-90k ms is the limit time (based on some test) where you can get all aggregata trading without hitting the 1000 results limit on the binance API
     time_window_ms = min_to_ms(time_window_min)
 
     requests_needed:int = math.ceil(time_window_ms/MAX_REQUEST_TIMEFRAME)
@@ -60,7 +57,7 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
     total_transactions:int = 0
     requests_hitting_limit:int = 0 #number of requests hitting the 1000 responses API limit
     final_price_timer:float = time.time()
-    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time, api_time_interval_ms= api_time_interval_ms) #price of the crypto token at the latest date in the timeframe
     print(f"final price took {time.time()- final_price_timer} ")
     if final_price == None:
          return None 
@@ -106,7 +103,7 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
         print(f"it took the time {time.time()- request_timer} for a binance api request")
     print(f"a total of {requests_needed} api requests is needed")
     start_timer: float = time.time()
-    start_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the earliest date in the timeframe
+    start_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time, api_time_interval_ms = api_time_interval_ms) #price of the crypto token at the earliest date in the timeframe
     print(f"start price took {time.time() - start_timer}")
     if start_price == None:
          return None 
@@ -124,7 +121,6 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
             f"{crypto_token}_NET_FLOW": round(total_buy_usd - total_sell_usd,3),
             f"{crypto_token}_TOTAL_AGGRT_TRANSACTIONS": total_transactions
     }
-
 
 if __name__ == "__main__":
    #print(binance_trading_volume(30, crypto_token="SOLUSDT"))

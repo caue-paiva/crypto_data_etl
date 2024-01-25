@@ -1,11 +1,7 @@
 import logging.config , json , os ,  time , math
-from dotenv import load_dotenv
-from typing import Callable
 import pandas as pd
 from crypto_apis.binance_api import binance_trading_volume , min_to_ms
 from datetime import datetime , timedelta
-
-load_dotenv(os.path.join("dataset_parameters.env"))
 
 """
 max time back of 2,75 years should take around 230 hours to complete (almost 10 days)
@@ -29,10 +25,10 @@ def setup_logging():
 
 setup_logging()
 
-def write_df_file(df:pd.DataFrame)->bool:
-        """
+"""def write_df_file(df:pd.DataFrame)->bool:
+        
         Tries to write the Dataframe file  locally for a set amount of times, returns True of False for the sucess of that op
-        """
+       
         max_write_tries:int = 20
         for i in range(max_write_tries):
             try:
@@ -44,7 +40,7 @@ def write_df_file(df:pd.DataFrame)->bool:
             return False
         
         return True
-
+"""
 
 
 class CryptoDataETL():
@@ -54,7 +50,7 @@ class CryptoDataETL():
     DATA_TIME_WINDOW_MIN = 5 #how many minutes of data does each column represent
     TRADE_API_TIME_INTERVAL = 100000 #in ms, the time window for getting aggregated transaction data
     DATA_CHUNK_NUM_ROWS = 10000 #how many rows of data are stored in each chunk of the dataframe, 10k rows means each chunk covers 834 hours
-    MAX_ROW_NUM:int  = math.ceil((MAX_TIME_FRAME_HOURS * 60)/DATA_TIME_WINDOW_MIN)
+    MAX_ROW_NUM:int  = math.ceil((MAX_TIME_FRAME_HOURS * 60)/DATA_TIME_WINDOW_MIN) #max number of rows for the CSV
     
     crypto_token: str
     __latest_unix_time: int #the latest/most recent unix time present in the dataset
@@ -69,7 +65,6 @@ class CryptoDataETL():
         self.__latest_unix_time:int = -1
         if enable_logs:
             self.__logger = logging.getLogger(f"crypto_data_etl_{crypto_token}")
-
 
     def __create_crypto_dataframe(self, time_frame_hours:int|float,crypto_token: str, end_unix_time:int = 0)-> pd.DataFrame | None: 
         """
@@ -91,9 +86,7 @@ class CryptoDataETL():
             raise IOError(f"Amount of hours exceeds MAX_TIME_FRAME of {self.MAX_TIME_FRAME_HOURS} hours ({self.MAX_TIME_FRAME_HOURS/24/365} years)")
         
         time_frame_mins:int | float = time_frame_hours * 60
-        DATA_TIME_WINDOW_MIN = int(os.getenv("DATA_TIME_WINDOW_MIN")) # type: ignore /// how many minutes of data does each column represent
-        
-        num_rows:int = math.ceil(time_frame_mins/DATA_TIME_WINDOW_MIN) #how many time_window rows will be needed to cover the entire time_frame passed as arg
+        num_rows:int = math.ceil(time_frame_mins/self.DATA_TIME_WINDOW_MIN) #how many time_window rows will be needed to cover the entire time_frame passed as arg
 
         columns_list:list[str] = [   
                     "DATE", 
@@ -104,30 +97,25 @@ class CryptoDataETL():
                     f"{crypto_token}_NET_FLOW",
                     f"{crypto_token}_TOTAL_AGGRT_TRANSACTIONS"
                                 ]
-        
         df = pd.DataFrame(columns = columns_list)
         
         if end_unix_time == 0:
             start_date = datetime.now().replace(microsecond=0)
-            bin_timer : float = time.time()
             cur_unix_time: int = int(time.time() * 1000)
-
-            
         else:
             start_date = datetime.fromtimestamp(end_unix_time /1000).replace(microsecond=0)
             cur_unix_time = end_unix_time
 
         for i in range(num_rows): #time window loop, each iteration adds a row to the df
             row_timer:float = time.time()
-            if "USDT" not in crypto_token:
-                cur = crypto_token + "USDT" #binance symbol for token to USDT (TETHER) price   
-            else:
-                cur = crypto_token
+          
+            cur = crypto_token
             api_return_time:float = time.time()
             data:dict | None = binance_trading_volume(
-                            time_window_min=DATA_TIME_WINDOW_MIN,
+                            time_window_min=self.DATA_TIME_WINDOW_MIN,
                             end_unix_time= cur_unix_time,  # type: ignore
-                            crypto_token= cur
+                            crypto_token= cur,
+                            api_time_interval_ms= self.TRADE_API_TIME_INTERVAL
                     )
             print(f"it took the time {time.time()- api_return_time} to get a return from api")
             if data == None: #in case the row data is incomplete, just skip that time frame 
@@ -142,12 +130,13 @@ class CryptoDataETL():
                             data.get(f"{cur}_TOTAL_AGGRT_TRANSACTIONS",None)
                         ]
             
-            cur_unix_time  -= min_to_ms(DATA_TIME_WINDOW_MIN)
+            cur_unix_time  -= min_to_ms(self.DATA_TIME_WINDOW_MIN)
             df.loc[i] = currency_data # type: ignore
-            start_date -= timedelta(minutes=DATA_TIME_WINDOW_MIN)
+            start_date -= timedelta(minutes=self.DATA_TIME_WINDOW_MIN)
             print(f"it took the time {time.time()- row_timer} to get a DF row")
-        print(f"we need {num_rows} rows")
+        
         if df.shape[0] == 0:
+            self.__logger.info(f"Dataframe with end_unix_time of {end_unix_time} wasnt able to be processed")
             return None
         return df       
 
@@ -191,9 +180,10 @@ class CryptoDataETL():
         return int(seconds*1000)
 
     def __get_num_chunks(self,time_frame_hours:float)->int:
-        rows_per_chunk:int = int(os.getenv("DATA_CHUNK_NUM_ROWS")) # type: ignore
+        rows_per_chunk:int = self.DATA_CHUNK_NUM_ROWS
         hours_per_chunk:int= math.ceil(rows_per_chunk/12) #12 rows make up 1 hour, since each row = 5min of data
         chunks:int = math.ceil(time_frame_hours/hours_per_chunk)
+       
         return chunks
 
     def __get_data_chunks(self,hours_per_chunk:float,chunks_of_data:int, cur_unix_time:int)->pd.DataFrame:
@@ -220,7 +210,7 @@ class CryptoDataETL():
                             crypto_token=self.crypto_token,
                             end_unix_time = cur_unix_time # type: ignore
                     )
-                    if not isinstance(chunk_df,pd.DataFrame):
+                    if not isinstance(chunk_df, pd.DataFrame):
                         raise ValueError("data-chunk returned is none")
                     
                     if first_data_chunk:
@@ -238,14 +228,32 @@ class CryptoDataETL():
                     self.__logger.info(f"tried to extract the chunk number {extracted_chunks+1}, csv currently has {extracted_chunks} chunks ,exception was {e}")
                     self.__logger.exception("failed to get a data chunk, re-trying")
                     chunk_tries+=1
-                    time.sleep(0.5)
+                    time.sleep(1)
         
         return df
 
-    def set_unix_time_from_df(self,):
-        pass
+    def set_unix_time_from_df(self,df:pd.DataFrame)->None:
+        """
+        Sets the instance variable (__latest_unix_time) to the latest date that was processed by a dataframe 
+        Plus an offset the size of each crypto trade API call timespam (TRADE_API_TIME_INTERVAL) in ms
 
-    def create_dataset(self,save_df_func: Callable[[pd.DataFrame],None])-> int | None:
+        Args:
+           df (pd.Dataframe) : the existing DF of which we will take the data and find the latest date already processed
+        
+        """
+        
+        if not isinstance(df, pd.DataFrame):
+            self.__logger.exception("in function set_unix_time_from_df: Input param df isnt of type Pandas Dataframe")
+            raise TypeError("in function set_unix_time_from_df: Input param df isnt of type Pandas Dataframe")
+        
+        if df.shape[0] == 0:
+            self.__logger.exception("in function set_unix_time_from_df: Input dataframe is empty")
+            raise TypeError("in function set_unix_time_from_df: Input dataframe is empty")
+        
+        newest_date: datetime = df.at[0, "DATE"]
+        self.__latest_unix_time = (int(datetime.timestamp(newest_date)) * 1000) + self.TRADE_API_TIME_INTERVAL
+
+    def create_dataset(self)-> pd.DataFrame:
         """
         Creates and fills an empty CSV dataset with a certain amount (set in a .env variable) of binance data for a certain crypto token
 
@@ -261,12 +269,11 @@ class CryptoDataETL():
         if self.__latest_unix_time != -1:
             raise Exception("dataset is not empty, please use the update_dataset function to update the existing data")
 
-        MAX_TIME_FRAME_HOURS:int = 3 #int(os.getenv("MAX_TIME_FRAME_HOURS ")) # type: ignore
+        MAX_TIME_FRAME_HOURS:int =  3 #self.MAX_TIME_FRAME_HOURS
         
         CHUNKS_OF_DATA:int = self.__get_num_chunks(MAX_TIME_FRAME_HOURS) #in how many data chunks we are going to split the extraction 
         hours_per_chunk: float = MAX_TIME_FRAME_HOURS/CHUNKS_OF_DATA #before 3, after 2.5
     
-
         cur_unix_time:int = self.__seconds_to_unix(time.time())
         self.__latest_unix_time = cur_unix_time
 
@@ -276,15 +283,9 @@ class CryptoDataETL():
                 cur_unix_time  = cur_unix_time
         )
         
-      
-    
-        if not save_df_func(df):
-            self.__logger.exception(f"Tried to save the data with the save_file_function ,wasnt able to do it ")
-            return None
+        return df 
         
-        return self.__latest_unix_time
-        
-    def update_dataset(self, get_df_func: Callable[[], pd.DataFrame | None],save_df_func: Callable[[pd.DataFrame],None])->int:
+    def update_dataset(self, df: pd.DataFrame)->pd.DataFrame:
         """
         updates the dataset with data from current time to the latest_unix_time in the dataset, a valid instance var of the latest_unix_time
         must be set before calling this method
@@ -292,6 +293,10 @@ class CryptoDataETL():
         """
         if self.__latest_unix_time == -1:
             raise Exception("last unix time covered by the data is empty, please provide the timestamp for an existing dataset of the use create_dataset func")
+        
+        if not isinstance(df, pd.DataFrame):
+            self.__logger.exception("in function update_dataset:  Input param df isnt of type Pandas Dataframe")
+            raise TypeError("Input param df isnt of type Pandas Dataframe")
 
         cur_unix_time:int = self.__seconds_to_unix(time.time())
         unix_time_dif:int = cur_unix_time - self.__latest_unix_time
@@ -299,11 +304,6 @@ class CryptoDataETL():
         time_frame_hours:float = unix_time_dif / 3600000  #unix time in ms to hours 
         num_of_chunks: int = self.__get_num_chunks(time_frame_hours)
         hours_per_chunk:float = time_frame_hours/num_of_chunks
-        
-        df: pd.DataFrame | None = get_df_func() #old df data
-        if df is None:
-            self.__logger.exception("Wasnt able to get the dataframe from the get_df_func")
-            raise Exception("Wasnt able to get the dataframe from the get_df_func")
         
         print(hours_per_chunk)
         updated_df: pd.DataFrame = self.__get_data_chunks( #df for the new data
@@ -316,10 +316,6 @@ class CryptoDataETL():
         self.__latest_unix_time = end_unix_time
         df = self.__add_crypto_dataframes(newer_data=updated_df,older_data=df)
 
-        if not save_df_func(df):
-            self.__logger.exception(f"Tried to save the data with the save_file_function ,wasnt able to do it ")
-            raise Exception("Wasnt able to save the dataframe with the save_df_func function ")
-        
-        return self.__latest_unix_time
+        return df
         
 
