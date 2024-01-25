@@ -1,5 +1,5 @@
 from crypto_apis.binance_api import binance_trading_volume , binance_server_time, min_to_ms
-import math , os
+import math , os, time
 from datetime import datetime , timedelta
 import pandas as pd
 from dotenv import load_dotenv
@@ -105,25 +105,29 @@ def create_crypto_dataframe(time_frame_hours:int|float,crypto_token: str, end_un
     
     if end_unix_time == 0:
         start_date = datetime.now().replace(microsecond=0)
+        bin_timer : float = time.time()
         cur_unix_time: int | None = binance_server_time()
+        print(f"it took the time {time.time()- bin_timer} to get binance server time")
 
         if cur_unix_time == None:
            return None
     else:
-         start_date = datetime.fromtimestamp(end_unix_time /1000)
+         start_date = datetime.fromtimestamp(end_unix_time /1000).replace(microsecond=0)
          cur_unix_time = end_unix_time
 
     for i in range(num_rows): #time window loop, each iteration adds a row to the df
-        
+        row_timer:float = time.time()
         if "USDT" not in crypto_token:
             cur = crypto_token + "USDT" #binance symbol for token to USDT (TETHER) price   
         else:
             cur = crypto_token
+        api_return_time:float = time.time()
         data:dict | None = binance_trading_volume(
                         time_window_min=DATA_TIME_WINDOW_MIN,
                         end_unix_time= cur_unix_time,  # type: ignore
                         crypto_token= cur
                    )
+        print(f"it took the time {time.time()- api_return_time} to get a return from api")
         if data == None: #in case the row data is incomplete, just skip that time frame 
             continue
         currency_data:list[float|int|datetime] = [
@@ -139,7 +143,8 @@ def create_crypto_dataframe(time_frame_hours:int|float,crypto_token: str, end_un
         cur_unix_time  -= min_to_ms(DATA_TIME_WINDOW_MIN)
         df.loc[i] = currency_data # type: ignore
         start_date -= timedelta(minutes=DATA_TIME_WINDOW_MIN)
-    
+        print(f"it took the time {time.time()- row_timer} to get a DF row")
+    print(f"we need {num_rows} rows")
     if df.shape[0] == 0:
         return None
     return df

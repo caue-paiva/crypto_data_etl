@@ -76,3 +76,83 @@ Traceback (most recent call last):
   File "/home/kap/first_de_project/de_project_env/lib/python3.11/site-packages/pandas/core/generic.py", line 1576, in __nonzero__
     raise ValueError(
 ValueError: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2024-01-24 18:37:36,965 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 78, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 63, in binance_trading_volume
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 36, in __binance_crypto_price
+    return float(json_result[0][1])
+                 ~~~~~~~~~~~^^^
+IndexError: list index out of range
+2024-01-24 18:37:38,332 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 78, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 63, in binance_trading_volume
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 36, in __binance_crypto_price
+    return float(json_result[0][1])
+                 ~~~~~~~~~~~^^^
+IndexError: list index out of range
+2024-01-24 18:37:39,562 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 78, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 63, in binance_trading_volume
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 36, in __binance_crypto_price
+    return float(json_result[0][1])
+                 ~~~~~~~~~~~^^^
+IndexError: list index out of range
+2024-01-24 18:38:19,193 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 78, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 63, in binance_trading_volume
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 36, in __binance_crypto_price
+    return float(json_result[0][1])
+                 ~~~~~~~~~~~^^^
+IndexError: list index out of range
+2024-01-24 18:38:20,322 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 78, in fill_dataset
+    chunk_df: pd.DataFrame | None = create_crypto_dataframe(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/data_processing_func.py", line 125, in create_crypto_dataframe
+    data:dict | None = binance_trading_volume(
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 63, in binance_trading_volume
+    final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kap/first_de_project/crypto_apis/binance_api.py", line 36, in __binance_crypto_price
+    return float(json_result[0][1])
+                 ~~~~~~~~~~~^^^
+IndexError: list index out of range
+2024-01-24 18:39:03,127 [ERROR] crypto_data_etl: failed to get a data chunk, re-trying
+Traceback (most recent call last):
+  File "/home/kap/first_de_project/main.py", line 85, in fill_dataset
+    raise ValueError("data-chunk returned is none")
+ValueError: data-chunk returned is none

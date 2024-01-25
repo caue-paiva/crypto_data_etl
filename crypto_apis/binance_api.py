@@ -1,4 +1,4 @@
-import requests , math  ,os
+import requests , math  ,os , time
 from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', "dataset_parameters.env"))
@@ -32,7 +32,8 @@ def __binance_crypto_price(symbol:str, end_time_unix:int)->float | None:
      else:
             print(F"Failure in getting aggregate trading data: {response.status_code}, response: {response.text}")
             return None
-     
+     if not json_result:
+          return None
      return float(json_result[0][1])
 
 def binance_server_time()->int | None:
@@ -44,7 +45,7 @@ def binance_server_time()->int | None:
             return None
 
 def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_unix_time:int = 0)-> dict[str,float|int] | None:
-   
+    bin_api_func :float = time.time()
     MAX_REQUEST_TIMEFRAME = int(os.getenv("TRADE_API_TIME_INTERVAL")) # type: ignore /// 60-90k ms is the limit time (based on some test) where you can get all aggregata trading without hitting the 1000 results limit on the binance API
     time_window_ms = min_to_ms(time_window_min)
 
@@ -59,9 +60,9 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
     
     total_transactions:int = 0
     requests_hitting_limit:int = 0 #number of requests hitting the 1000 responses API limit
-   
+    final_price_timer:float = time.time()
     final_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the latest date in the timeframe
-
+    print(f"final price took {time.time()- final_price_timer} ")
     if final_price == None:
          return None 
 
@@ -71,7 +72,7 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
     total_buy_usd:float  = 0.0
     
     for i in range(requests_needed):
-        
+        request_timer:float = time.time()
         params:dict = {
             "symbol": crypto_token,
             "startTime" : end_time - MAX_REQUEST_TIMEFRAME,  #em ms , a maior janela que chega perto do limite de 1000 respostas é 90000 ms
@@ -103,15 +104,17 @@ def binance_trading_volume(time_window_min: float|int, crypto_token:str, end_uni
                     total_buy_usd += quantity * price 
 
         end_time -= MAX_REQUEST_TIMEFRAME
-
+        print(f"it took the time {time.time()- request_timer} for a binance api request")
+    print(f"a total of {requests_needed} api requests is needed")
+    start_timer: float = time.time()
     start_price: float | None = __binance_crypto_price(symbol=crypto_token,end_time_unix=end_time) #price of the crypto token at the earliest date in the timeframe
-
+    print(f"start price took {time.time() - start_timer}")
     if start_price == None:
          return None 
     
     #if requests_hitting_limit/requests_needed > 0.5:
         #  print("More than half of requests are hitting the binance API rate limit")
-    
+    print(f"the binan api func took {time.time()-bin_api_func}")
     return {
             f"{crypto_token}_START_PRICE": start_price, 
             f"{crypto_token}_END_PRICE": final_price, 
