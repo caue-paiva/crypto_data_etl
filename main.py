@@ -38,7 +38,7 @@ def setup_argv()->tuple[str,str]:
     return state_arg, crypto_token_arg
 
 def save_df(df: pd.DataFrame):
-    df.to_csv("teste4.csv",index=False)
+    df.to_csv("data_files/teste4.csv",index=False)
     pass
 
 def change_state_lambda(new_state, time_lag_hours: float):
